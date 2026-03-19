@@ -1,0 +1,23 @@
+Terms of Use and Privacy Policy
+Welcome to the Criterion Critical Text Edition Platform. Before proceeding with registration, please read the following terms carefully.
+
+Terms of Use
+By using this application, the user agrees to:
+- Use Criterion exclusively for the creation and management of digital critical editions
+- Respect the intellectual property rights of others
+- Not use the software for illegal or harmful purposes
+- Confirm that all data entered is accurate and does not violate any laws
+
+Privacy Policy
+Criterion is committed to protecting users' personal data in accordance with the European Union's General Data Protection Regulation (GDPR). Specifically:
+- Personal data is collected exclusively to provide the application's services
+- Data is stored securely and encrypted
+- Data is not shared with third parties without the user's explicit consent
+- Users have the right to access, correct, and delete their data (Art. 17 GDPR – "right to be forgotten")
+- In the event of account deletion, all personal data is permanently erased from the system within 24 hours
+
+Criterion uses the "GPLv3 (GNU General Public License v3)" licensing model in accordance with the requirements of the European project ITSERR – WP3.
+
+For further information, visit the "Help > About Criterion" section within the application or consult the complete documentation available on the official website.
+
+By accepting, I confirm that I have read and understood the Terms of Use and Privacy Policy and consent to the processing of my personal data as described.
