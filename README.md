@@ -35,7 +35,7 @@ Project documentation describes production packaging for:
 
 Treat published releases (and the repository build configuration) as the authoritative source of what is currently shipped.
 
-## Repository structure (high level)
+## Repository structure (high level) (https://code-repo.d4science.org/Resilience/WP3-criterion/)
 
 A high-level structure is documented as:
 
