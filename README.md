@@ -69,7 +69,7 @@ yarn install
 # Step 5: Launch development server
 yarn dev
 
-## Print preview component (Java + TinyTeX)
+## Print preview component (Java + TinyTeX) (https://code-repo.d4science.org/Resilience/WP3-criterion-printpreview/)
 
 The print-preview component expects a specific runtime folder layout.
 
