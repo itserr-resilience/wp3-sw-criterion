@@ -156,32 +156,119 @@ node --version   # Should print v24.11.0
 
 ### Step-by-Step First Run
 
-Once your platform-specific setup is complete, follow these steps **in order**:
+Once your platform-specific setup is complete, run the following steps in order.
+
+1. Clone the repository
 
 ```bash
-# ─── Step 1: Clone the repository ───────────────────────────────────────────
 git clone <repository-url> criterion && cd criterion
-# Expected: "Cloning into 'criterion'..." — you are now inside the project folder
-
-# ─── Step 2: Install and activate the correct Node.js version ────────────────
-nvm install    # Reads .nvmrc → installs Node.js 24.11.0 if not already installed
-nvm use        # Activates Node.js 24.11.0 for this terminal session
-# Expected: "Now using node v24.11.0 (npm v...)"
-
-# ─── Step 3: Enable Corepack (activates Yarn 4) ─────────────────────────────
-corepack enable
-# Expected: no output (silence means success)
-
-# ─── Step 4: Install all project dependencies ───────────────────────────────
-yarn install
-# Expected: Downloads ~200 packages into node_modules/. First run takes 2-5 min.
-# You may see "➤ YN0000: · Done ..." when finished.
-
-# ─── Step 5: Launch the development server ──────────────────────────────────
-yarn dev       # (Linux: use `yarn dev-linux` if you get sandbox errors)
-# Expected: Vite compiles main + preload + renderer processes,
-# then Electron opens the Criterion application window.
 ```
+
+Expected result: you are inside the `criterion` project folder.
+
+2. Install and activate the required Node.js version
+
+```bash
+nvm install
+nvm use
+```
+
+Expected result: terminal shows Node.js `v24.11.0` in use.
+
+3. Enable Corepack (Yarn 4)
+
+```bash
+corepack enable
+```
+
+Expected result: command exits without errors.
+
+4. Install dependencies
+
+```bash
+yarn install
+```
+
+Expected result: dependencies are installed into `node_modules`.
+
+5. Create a local `.env` file
+
+macOS/Linux:
+
+```bash
+cat > .env <<'EOF'
+# Criterion - Development Environment
+# =============================================================================
+
+# Environment identifier
+VITE_APP_ENV=development
+
+# =============================================================================
+# Document Signing (Internal)
+# =============================================================================
+MAIN_VITE_DOCUMENT_SIGN_KEY=81f1cc5b1d262b8e5d028dc6076dded7783e4990e670dfe0934d125c25e0073a
+
+# =============================================================================
+# Debug & Logging
+# =============================================================================
+VITE_DEBUG_MODE=true
+VITE_LOG_LEVEL=debug
+
+# =============================================================================
+# Feature Flags
+# =============================================================================
+VITE_ENABLE_DEV_TOOLS=true
+VITE_ENABLE_MOCK_DATA=false
+EOF
+```
+
+Windows PowerShell:
+
+```powershell
+@"
+# Criterion - Development Environment
+# =============================================================================
+
+# Environment identifier
+VITE_APP_ENV=development
+
+# =============================================================================
+# Document Signing (Internal)
+# =============================================================================
+MAIN_VITE_DOCUMENT_SIGN_KEY=81f1cc5b1d262b8e5d028dc6076dded7783e4990e670dfe0934d125c25e0073a
+
+# =============================================================================
+# Debug & Logging
+# =============================================================================
+VITE_DEBUG_MODE=true
+VITE_LOG_LEVEL=debug
+
+# =============================================================================
+# Feature Flags
+# =============================================================================
+VITE_ENABLE_DEV_TOOLS=true
+VITE_ENABLE_MOCK_DATA=false
+"@ | Set-Content -Path .env
+```
+
+> **Important — Document signing key compatibility**
+> `MAIN_VITE_DOCUMENT_SIGN_KEY` is used to sign documents.
+> If this key changes, documents created with the previous key will no longer be usable.
+> Only documents created after the key change will be usable.
+
+6. Launch the development server
+
+```bash
+yarn dev
+```
+
+Linux sandbox fallback:
+
+```bash
+yarn dev-linux
+```
+
+Expected result: Vite compiles all processes and Electron opens the application window.
 
 > **Tip**: After `yarn install`, Electron's native dependencies are automatically rebuilt via the `postinstall` script (`electron-builder install-app-deps`). You don't need to do anything extra.
 
@@ -201,9 +288,7 @@ Here's what the key configuration files in the project root do — you'll encoun
 | `tsconfig.json`           | Root TypeScript configuration.                                                                                                                                         |
 | `tsconfig.node.json`      | TypeScript config for main + preload processes (Node.js target).                                                                                                       |
 | `tsconfig.web.json`       | TypeScript config for the renderer process (browser target).                                                                                                           |
-| `.env.development`        | Environment variables for **development** builds (`VITE_DEBUG_MODE=true`, etc.).                                                                                       |
-| `.env.staging`            | Environment variables for **staging** builds.                                                                                                                          |
-| `.env.production`         | Environment variables for **production** builds (`VITE_DEBUG_MODE=false`, etc.).                                                                                       |
+| `.env`                    | Local environment variables for development (`VITE_DEBUG_MODE=true`, `VITE_LOG_LEVEL=debug`, etc.).                                                                   |
 | `eslint.config.mjs`       | ESLint 9 flat config for linting rules.                                                                                                                                |
 | `.stylelintrc.json`       | Stylelint config for CSS/SCSS linting.                                                                                                                                 |
 | `tailwind.config.cjs`     | TailwindCSS configuration with custom color palette.                                                                                                                   |
@@ -214,18 +299,18 @@ Here's what the key configuration files in the project root do — you'll encoun
 
 ### Environment Variables Quick Reference
 
-The project uses three environment files — each loaded automatically based on the build mode:
+Use a single local `.env` file for development.
 
-| Variable                      | `.env.development` | `.env.staging` | `.env.production` |
-| ----------------------------- | ------------------ | -------------- | ----------------- |
-| `VITE_APP_ENV`                | `development`      | `staging`      | `production`      |
-| `VITE_DEBUG_MODE`             | `true`             | `true`         | `false`           |
-| `VITE_LOG_LEVEL`              | `debug`            | `info`         | `error`           |
-| `VITE_ENABLE_DEV_TOOLS`       | `true`             | `true`         | `false`           |
-| `VITE_ENABLE_MOCK_DATA`       | `false`            | `false`        | `false`           |
-| `MAIN_VITE_DOCUMENT_SIGN_KEY` | _(set)_            | _(set)_        | _(set)_           |
+| Variable                      | `.env` value    |
+| ----------------------------- | --------------- |
+| `VITE_APP_ENV`                | `development`   |
+| `VITE_DEBUG_MODE`             | `true`          |
+| `VITE_LOG_LEVEL`              | `debug`         |
+| `VITE_ENABLE_DEV_TOOLS`       | `true`          |
+| `VITE_ENABLE_MOCK_DATA`       | `false`         |
+| `MAIN_VITE_DOCUMENT_SIGN_KEY` | _(set manually)_ |
 
-> **How are env files selected?** The `cross-env NODE_ENV=<env>` in each script tells electron-vite which `.env.*` file to load. For example, `yarn dev` loads `.env.development`, while `yarn build` loads `.env.production`.
+> **Security note**: Keep `.env` local only. Never commit real signing keys to the repository.
 
 ### Troubleshooting Common Installation Issues
 
