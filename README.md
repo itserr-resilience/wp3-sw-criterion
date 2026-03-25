@@ -35,7 +35,7 @@ Project documentation describes production packaging for:
 
 Treat published releases (and the repository build configuration) as the authoritative source of what is currently shipped.
 
-## Repository structure (high level) (https://code-repo.d4science.org/Resilience/WP3-criterion/)
+## Repository structure (high level)
 
 A high-level structure is documented as:
 
@@ -66,10 +66,23 @@ corepack enable
 # Step 4: Install project dependencies
 yarn install
 
-# Step 5: Launch development server
+# Step 5: Create a local .env file 
+Create a file named `.env` in the project root by following the official setup in the CriterionDeveloperGuide:
+
+https://github.com/itserr-resilience/wp3-sw-criterion/blob/main/CriterionDeveloperGuide.md#2-development-environment-setup
+
+Use only a local `.env` file for development, and never commit real signing keys.
+
+Security note:
+- Do not commit `.env` files or real signing keys to the repository.
+
+# Step 6: Launch development server
 yarn dev
 
-## Print preview component (Java + TinyTeX) (https://code-repo.d4science.org/Resilience/WP3-criterion-printpreview/)
+Environment note:
+- This repository supports development-only environment scripts.
+
+## Print preview component (Java + TinyTeX)
 
 The print-preview component expects a specific runtime folder layout.
 
