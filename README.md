@@ -36,7 +36,10 @@ Project documentation describes production packaging for:
 Treat published releases (and the repository build configuration) as the authoritative source of what is currently shipped.
 
 ## Development setup (desktop application)
-Please refer to the development guides to setup the environments for both components
+Please refer to the development guides to setup the environments for both components:
+- for Criterion follow this link: https://github.com/itserr-resilience/wp3-sw-criterion/blob/main/CriterionDeveloperGuide.md
+
+- for Print preview follow this link:https://github.com/itserr-resilience/wp3-sw-criterion/blob/main/PrintPreviewDevGuide.md
 
 ## Governance and project processes
 
