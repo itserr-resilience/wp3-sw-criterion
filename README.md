@@ -35,74 +35,8 @@ Project documentation describes production packaging for:
 
 Treat published releases (and the repository build configuration) as the authoritative source of what is currently shipped.
 
-## Repository structure (high level)
-
-A high-level structure is documented as:
-
-- src/
-  - main/ (Electron main process)
-  - preload/ (contextBridge API surface)
-  - renderer/src/ (React UI)
-- i18n/ (translations)
-- resources/ (JSON configs)
-- buildResources/ (build assets, including print preview assets)
-- docs/ (documentation)
-
 ## Development setup (desktop application)
-
-Follow the repository configuration and developer documentation as the source of truth for prerequisites and commands (for example: .nvmrc, package.json, yarn.lock, and any developer guide in docs/).
-
-The typical baseline workflow is:
-
-# Step 1: Clone the repository
-git clone <repository-url> criterion && cd criterion
-
-# Step 2: Configure Node.js runtime (via nvm)
-nvm install && nvm use
-
-# Step 3: Enable Yarn package manager
-corepack enable
-
-# Step 4: Install project dependencies
-yarn install
-
-# Step 5: Create a local .env file 
-Create a file named `.env` in the project root by following the official setup in the CriterionDeveloperGuide:
-
-https://github.com/itserr-resilience/wp3-sw-criterion/blob/main/CriterionDeveloperGuide.md#2-development-environment-setup
-
-Use only a local `.env` file for development, and never commit real signing keys.
-
-Security note:
-- Do not commit `.env` files or real signing keys to the repository.
-
-# Step 6: Launch development server
-yarn dev
-
-Environment note:
-- This repository supports development-only environment scripts.
-
-## Print preview component (Java + TinyTeX)
-
-The print-preview component expects a specific runtime folder layout.
-
-Safety note:
-- The print-preview tool treats its compile directory as disposable and may delete files in that directory during normal operation. Do not point it at a folder containing anything important.
-
-Expected runtime layout (conceptual):
-
-<APP_HOME>/
-  PrintPreviewNav.jar
-  fonts/
-  TinyTeX-win/… (Windows)
-  TinyTeX-lin/… (Linux)
-  TinyTeX-mac/… (macOS)
-
-For CLI usage, end-to-end examples, and build guidance, follow the print-preview developer documentation included in this repository.
-
-## Build and distribution
-
-Build and distribution must be executed using the repository’s build scripts and configuration (CI and package.json scripts are authoritative). Only claim platform support for artifacts that are actually produced and published.
+Please refer to the development guides to setup the environments for both components
 
 ## Governance and project processes
 
