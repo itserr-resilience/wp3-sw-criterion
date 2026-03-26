@@ -1,52 +1,132 @@
 **PrintPreview --- Spring Boot Development Guide**
 
-*Code-based guide for the PrintPreview CLI that renders Critx documents
-to LaTeX and compiles them with XeLaTeX.*
+*Code-based guide for the PrintPreview CLI that renders Critx documents to LaTeX and compiles them with XeLaTeX.*
 
 # Getting started (download → build → run)
 
-PrintPreview is a Spring Boot application, but you should think of it as
-a batch compiler, not a service. It starts, processes one .critx
-document, writes build artifacts, and exits. There is no HTTP layer and
-no interactive mode: everything is driven by a strict, positional CLI
-contract.
+PrintPreview is a Spring Boot application, but you should think of it as a batch compiler, not a service. It starts, processes one `.critx` document, writes build artifacts, and exits. There is no HTTP layer and no interactive mode: everything is driven by a strict, positional CLI contract.
 
-**Step 1 --- Download the repository and check prerequisites**
+## Step 1 - Download the repository and check prerequisites
+
+### 1.1 Download this project from the Git repository
+
+Repository URL:
+
+<https://code-repo.d4science.org/Resilience/WP3-criterion-printpreview.git>
+
+Follow these steps:
+
+1. Choose a parent folder where you want to store the project.
+
+2. Open a terminal in that parent folder.
+
+3. Clone the repository:
+
+```bash
+git clone https://code-repo.d4science.org/Resilience/WP3-criterion-printpreview.git
+```
+
+4. Enter the project directory:
+
+```bash
+cd WP3-criterion-printpreview
+```
+
+5. Verify that the remote is correctly configured:
+
+```bash
+git remote -v
+```
+
+You should see `origin` pointing to:
+
+`https://code-repo.d4science.org/Resilience/WP3-criterion-printpreview.git`
+
+6. Verify that you are in the project root (you should see `pom.xml`):
+
+```bash
+ls
+```
+
+If the repository requires authentication, use your organization credentials/token when prompted by the Git server.
 
 After you clone/download the repository, you need:
 
+- Git (optional, only if you clone instead of downloading an archive)
+  - Download page: <https://git-scm.com/downloads>
+
 - Java 21 (to run locally)
+  - Eclipse Temurin 21: <https://adoptium.net/temurin/releases/?version=21>
+  - Oracle JDK 21: <https://www.oracle.com/java/technologies/downloads/#java21>
 
-- Maven (to build the runnable JAR)
+- Apache Maven (to build the runnable JAR)
+  - Version to install: latest stable Apache Maven 3.9.x (or newer stable release).
+  - Download page: <https://maven.apache.org/download.cgi>
+  - Official docs: <https://maven.apache.org/guides/index.html>
+  - Windows setup (recommended: Apache **Binary zip archive**):
+    1. Install JDK 21 first, then confirm Java is available (`java -version`).
+    2. Download Maven from the Apache page (Binary zip archive, not source).
+    3. Extract it, for example to `C:\tools\apache-maven-3.9.x`.
+    4. Set `MAVEN_HOME=C:\tools\apache-maven-3.9.x`.
+    5. Add `%MAVEN_HOME%\bin` to `PATH`.
+    6. Open a new terminal and verify with `mvn -v`.
+  - macOS setup (recommended: Homebrew):
+    1. Install JDK 21 first, then confirm Java is available (`java -version`).
+    2. Install Maven with Homebrew:
 
-- Criterion installed only if you plan to test in "integrated" mode
-  (inside Criterion).
+```bash
+brew install maven
+```
 
-**Step 2 --- Build the application (JAR)**
+    3. Verify with `mvn -v`.
+    4. If you do not use Homebrew, extract the Apache binary tar.gz (for example in `/opt/apache-maven-3.9.x`) and add `MAVEN_HOME` plus `$MAVEN_HOME/bin` to your shell profile (`~/.zshrc` or `~/.bashrc`).
+  - Linux setup (package manager or Apache binary):
+    1. Install JDK 21 first, then confirm Java is available (`java -version`).
+    2. Install Maven with your distro package manager (examples):
 
-From the project root (the folder that contains pom.xml), build the
-runnable Spring Boot JAR with:
+```bash
+# Debian/Ubuntu
+sudo apt update && sudo apt install -y maven
 
+# Fedora/RHEL/CentOS
+sudo dnf install -y maven
+
+# Arch Linux
+sudo pacman -S maven
+```
+
+    3. Verify with `mvn -v`.
+    4. If your distro package is outdated, use the Apache binary tar.gz and set `MAVEN_HOME` plus `$MAVEN_HOME/bin` in your profile.
+  - Verify installation on every OS (new terminal session):
+
+```bash
+mvn -v
+```
+
+- Criterion installed only if you plan to test in "integrated" mode (inside Criterion).
+  - Use your Criterion installation package/repository used by your team.
+
+## Step 2 - Build the application (JAR)
+
+From the project root (the folder that contains `pom.xml`), build the runnable Spring Boot JAR with:
+
+```bash
 mvn -U clean package
+```
 
-After the build, look in target/. You will typically see:
+After the build, look in `target/`. You will typically see:
 
-- target/\<artifactId\>-\<version\>.jar (this is the executable "fat
-  jar", if Spring Boot repackaging is enabled)
+- `target/<artifactId>-<version>.jar` (this is the executable "fat jar", if Spring Boot repackaging is enabled)
 
-- target/\<artifactId\>-\<version\>.jar.original (sometimes present; the
-  pre-repackage thin jar)
+- `target/<artifactId>-<version>.jar.original` (sometimes present; the pre-repackage thin jar)
 
-Make sure you run the executable fat jar. If repackaging is not active,
-Maven may produce only a thin jar (usually small) and running it will
-fail with ClassNotFoundException.
+Make sure you run the executable fat jar. If repackaging is not active, Maven may produce only a thin jar (usually small) and running it will fail with `ClassNotFoundException`.
 
-**Step 3 --- Choose how to run it**
+## Step 3 - Choose how to run it
 
-You have two supported execution modes: integrated (via Criterion) and
-standalone (direct CLI).
+You have two supported execution modes: integrated (via Criterion) and standalone (direct CLI).
 
-**A) Integrated mode (run through Criterion)**
+### A) Integrated mode (run through Criterion)
 
 Use this mode when you want to test your changes through Criterion's
 Print Preview functionality.
@@ -55,154 +135,104 @@ Prerequisite: Criterion must already be installed on your machine.
 
 Once you have built a new JAR, copy it into:
 
-\<INSTALLATION-DIRECTORY\>\\resources\\buildResources\\printPreview
+```text
+<INSTALLATION-DIRECTORY>\resources\buildResources\printPreview
+```
 
 Then launch Criterion and test using the Print Preview feature.
 
-**B) Standalone mode (run the CLI directly -- no Criterion required)**
+### B) Standalone mode (run the CLI directly -- no Criterion required)
 
-Standalone mode is designed around a "portable folder": everything the
-app needs sits next to the JAR. The key detail is that the app resolves
-the embedded XeLaTeX toolchain relative to the current working directory
-(user.dir). That means you must run the JAR from an "app home" folder
-that contains the JAR plus its resources in predictable locations.
+Standalone mode is designed around a "portable folder": everything the app needs sits next to the JAR. The key detail is that the app resolves the embedded XeLaTeX toolchain relative to the current working directory (`user.dir`). That means you must run the JAR from an "app home" folder that contains the JAR plus its resources in predictable locations.
 
-1\. Create an APP_HOME folder (portable runtime layout)
+#### 1. Create an APP_HOME folder (portable runtime layout)
 
-Create a folder anywhere you like (this will be your \<APP_HOME\>), then
-place the JAR and resources like this:
+Create a folder anywhere you like (this will be your `<APP_HOME>`), then place the JAR and resources like this:
 
-\<APP_HOME\>/
+```text
+<APP_HOME>/
+  printpreview-0.0.1-SNAPSHOT.jar
+  fonts/
+  TinyTeX-win/...   (Windows only)
+  TinyTeX-lin/...   (Linux only)
+  TinyTeX-mac/...   (macOS only)
+```
 
-printpreview-0.0.1-SNAPSHOT.jar
+You only need the `TinyTeX-*` folder that matches your OS. The `fonts/` folder matters because XeLaTeX uses it when the generated LaTeX contains "foreign" scripts (Greek, Hebrew, Arabic, Cyrillic, etc.). If fonts are missing, compilation can fail or you can get broken output (missing glyphs / wrong substitutions). You can get the `fonts/` folder from both the installed Criterion (under `<INSTALLATION-DIRECTORY>\resources\buildResources\printPreview`) or from the Criterion repository.
 
-fonts/
+**Important**: do not download TinyTeX from the official website for this setup. The TinyTeX distribution used here is customized for Criterion/PrintPreview, and the standard download will not work out of the box. Instead, copy the TinyTeX folder from a Criterion installation or obtain it from the project repository used for Criterion.
 
-TinyTeX-win/... (Windows only)
+#### 2. Understand compileDir (before you run anything)
 
-TinyTeX-lin/... (Linux only)
+Every run needs a `compileDir`. This is not just "where the PDF goes": it is the working directory for the LaTeX build. The tool writes the generated `.tex` there, runs XeLaTeX, and leaves the PDF plus LaTeX auxiliary/log files there as well.
 
-TinyTeX-mac/... (macOS only)
+Pick `compileDir` as a disposable folder outside `<APP_HOME>`, for example:
 
-You only need the TinyTeX-\* folder that matches your OS. The fonts/
-folder matters because XeLaTeX uses it when the generated LaTeX contains
-"foreign" scripts (Greek, Hebrew, Arabic, Cyrillic, etc.). If fonts are
-missing, compilation can fail or you can get broken output (missing
-glyphs / wrong substitutions). You can get the fonts/ folder from both
-the installed Criterion (under
-\<INSTALLATION-DIRECTORY\>\\resources\\buildResources\\printPreview or
-from the Criterion repository)
+- Windows: `C:\temp\ppn-build`
 
-**Important**: do not download TinyTeX from the official website for
-this setup. The TinyTeX distribution used here is customized for
-Criterion/PrintPreview, and the standard download will not work out of
-the box. Instead, copy the TinyTeX folder from a Criterion installation
-or obtain it from the project repository used for Criterion.
+- macOS/Linux: `/tmp/ppn-build`
 
-2\. Understand compileDir (before you run anything)
+> **DANGER - READ THIS FIRST**
+> At startup, the application cleans `compileDir` by deleting every file it finds there (files only). That is intentional (it prevents stale LaTeX artifacts from affecting results), but it also means:
+> - never point `compileDir` at a folder that contains anything you care about
+> - never point it at your install folder / `<APP_HOME>`
+> - keep it separate from the application's binaries and resources
 
-Every run needs a compileDir. This is not just "where the PDF goes": it
-is the working directory for the LaTeX build. The tool writes the
-generated .tex there, runs XeLaTeX, and leaves the PDF plus LaTeX
-auxiliary/log files there as well.
+#### 3. Run a minimal end-to-end test
 
-Pick compileDir as a disposable folder outside \<APP_HOME\>, for
-example:
+Windows (PowerShell): first `cd` into `<APP_HOME>` (the folder that contains the jar, fonts, and `TinyTeX-*`), then run:
 
-- Windows: C:\\temp\\ppn-build
+```powershell
+cd C:\path\to\APP_HOME
 
-- macOS/Linux: /tmp/ppn-build
+java -jar printpreview-0.0.1-SNAPSHOT.jar "C:\path\to\sample.critx" 1 1 1 1 "C:\temp\ppn-build" 4
+```
 
-**DANGER --- READ THIS FIRST**
+macOS / Linux (bash/zsh): again, `cd` into `<APP_HOME>`, create `compileDir`, then run:
 
-At startup, the application cleans compileDir by deleting every file it
-finds there (files only). That is intentional (it prevents stale LaTeX
-artifacts from affecting results), but it also means:
-
-- never point compileDir at a folder that contains anything you care
-  about
-
-- never point it at your install folder / \<APP_HOME\>
-
-- keep it separate from the application's binaries and resources
-
-3\. Run a minimal end-to-end test
-
-Windows (PowerShell): First cd into \<APP_HOME\> (the folder that
-contains the jar, fonts, and TinyTeX-\*), then run:
-
-cd C:\\path\\to\\APP_HOME
-
-java -jar printpreview-0.0.1-SNAPSHOT.jar \"C:\\path\\to\\sample.critx\"
-1 1 1 1 \"C:\\temp\\ppn-build\" 4
-
-macOS / Linux (bash/zsh): Again, cd into \<APP_HOME\>, create
-compileDir, then run:
-
+```bash
 cd /path/to/APP_HOME
 
 mkdir -p /tmp/ppn-build
 
-java -jar printpreview-0.0.1-SNAPSHOT.jar \"/path/to/sample.critx\" 1 1
-1 1 \"/tmp/ppn-build\" 4
+java -jar printpreview-0.0.1-SNAPSHOT.jar "/path/to/sample.critx" 1 1 1 1 "/tmp/ppn-build" 4
+```
 
-4\. What you should see in compileDir
+#### 4. What you should see in compileDir
 
-If your input is sample.critx, the program derives the base name
-"sample" and writes:
+If your input is `sample.critx`, the program derives the base name `sample` and writes:
 
-- sample.tex (always)
+- `sample.tex` (always)
 
-- sample.pdf (only if XeLaTeX succeeds)
+- `sample.pdf` (only if XeLaTeX succeeds)
 
-Step 4 --- The CLI contract (positional arguments)
+## Step 4 - The CLI contract (positional arguments)
 
-This application is intentionally strict: there are no named flags and
-no interactive prompts. Arguments are parsed by index, so if you shift
-one parameter, everything after it becomes wrong. In practice, treat the
-invocation like a compiler command and consider wrapping it in a script
-or an IDE run configuration to avoid human error. The required arguments
-are:
+This application is intentionally strict: there are no named flags and no interactive prompts. Arguments are parsed by index, so if you shift one parameter, everything after it becomes wrong. In practice, treat the invocation like a compiler command and consider wrapping it in a script or an IDE run configuration to avoid human error.
 
-Position 0: critxFilePath
+Required arguments:
 
-Path to the .critx JSON document.
+| Position | Name | Description |
+|---|---|---|
+| 0 | `critxFilePath` | Path to the `.critx` JSON document. |
+| 1-4 | section flags (`printToc`, `printIntro`, `printMain`, `printBiblio`) | Each flag is interpreted with a very strict rule: only the string `"1"` means true; any other value means false. This selectively includes or omits entire document parts from the generated LaTeX. |
+| 5 | `compileDir` | Disposable working directory for the build (cleaned at startup). Keep it outside `<APP_HOME>` and never use a directory with valuable files. |
+| 6 | `compileRuns` | Number of XeLaTeX passes. Allowed values are only 1, 2, or 4. Multiple passes are normal in LaTeX (TOC/cross-references and reledmac-style constructs often need reruns to stabilize). Use 4 when you want the most stable output. |
+| 7..n | `commentAuthors` (optional) | Any additional arguments are treated as a list of comment author identifiers used to filter which comments/annotations are rendered. |
 
-Position 1--4: section flags (printToc, printIntro, printMain,
-printBiblio)
-
-Each flag is interpreted with a very strict rule: only the string \"1\"
-means true; any other value means false. This selectively includes or
-omits entire document parts from the generated LaTeX.
-
-Position 5: compileDir
-
-Disposable working directory for the build (cleaned at startup). Keep it
-outside \<APP_HOME\> and never use a directory with valuable files.
-
-Position 6: compileRuns
-
-Number of XeLaTeX passes. Allowed values are only 1, 2, or 4. Multiple
-passes are normal in LaTeX (TOC/cross-references and reledmac-style
-constructs often need reruns to stabilize). Use 4 when you want the most
-stable output.
-
-Position 7..n: commentAuthors (optional)
-
-Any additional arguments are treated as a list of comment author
-identifiers used to filter which comments/annotations are rendered.
-
-Example with comment author filters
+### Example with comment author filters
 
 Windows:
 
-java -jar printpreview-0.0.1-SNAPSHOT.jar \"C:\\path\\to\\sample.critx\"
-1 1 1 1 \"C:\\temp\\ppn-build\" 4 \"mario.rossi\"
+```powershell
+java -jar printpreview-0.0.1-SNAPSHOT.jar "C:\path\to\sample.critx" 1 1 1 1 "C:\temp\ppn-build" 4 "mario.rossi"
+```
 
 macOS/Linux:
 
-java -jar printpreview-0.0.1-SNAPSHOT.jar \"/path/to/sample.critx\" 1 1
-1 1 \"/tmp/ppn-build\" 4 \"mario.rossi\"
+```bash
+java -jar printpreview-0.0.1-SNAPSHOT.jar "/path/to/sample.critx" 1 1 1 1 "/tmp/ppn-build" 4 "mario.rossi"
+```
 
 # Purpose and mental model
 
@@ -719,7 +749,7 @@ This matters because renderers rely on "current is empty" to mean
 no content". That distinction avoids off-by-one bugs when renderers do
 lookahead or when they need to stop precisely at section boundaries.
 
-  ----------------------------------------------------------------------
+----------------------------------------------------------------------
   public Optional\<NodeHandle\> first() {\
   if (dfs.isEmpty()) { idx = -1; return Optional.empty(); }\
   idx = 0;\
@@ -794,7 +824,7 @@ lookahead or when they need to stop precisely at section boundaries.
   }
   ----------------------------------------------------------------------
 
-  ----------------------------------------------------------------------
+----------------------------------------------------------------------
 
 After Node normalization and DFS flattening, the LaTeX side of the
 codebase treats the document as an ordered stream of stable node kinds.
@@ -855,7 +885,7 @@ parses the apparatus object and registers every parsed ApparatusEntry
 into entryById as it goes. The parse method then registers the returned
 Apparatus into apparatusById keyed by apparatus.getId().
 
-  ----------------------------------------------------------------------
+----------------------------------------------------------------------
   public ApparatusStore parse(JsonNode root) {\
   Map\<String, Apparatus\> apparatusById = new HashMap\<\>();\
   Map\<String, ApparatusEntry\> entryById = new HashMap\<\>();\
@@ -885,7 +915,7 @@ Apparatus into apparatusById keyed by apparatus.getId().
   }
   ----------------------------------------------------------------------
 
-  ----------------------------------------------------------------------
+----------------------------------------------------------------------
 
 Index correctness is the enabling constraint for the rest of the
 subsystem. Once ApparatusStore exists, "extract and overlay" becomes a
@@ -1039,7 +1069,7 @@ letters." This contract isolates reledmac's letter-based requirement to
 one class and keeps the rest of the rendering code working with domain
 identifiers rather than LaTeX conventions.
 
-  ----------------------------------------------------------------------
+----------------------------------------------------------------------
   public ApparatusSeriesMapper(ApparatusStore store) {\
   Objects.requireNonNull(store, \"store\");\
   \
@@ -1094,7 +1124,7 @@ identifiers rather than LaTeX conventions.
   {
   ----------------------------------------------------------------------
 
-  ----------------------------------------------------------------------
+----------------------------------------------------------------------
 
 ## Overlap analysis and preview overlays
 
