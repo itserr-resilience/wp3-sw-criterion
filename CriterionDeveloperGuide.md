@@ -67,11 +67,35 @@ Before you begin, you need to install the following tools. Each one plays a spec
 | 5   | **Yarn**                 | 4.x (Berry)                      | Package manager for installing dependencies. The project uses Yarn 4 "Berry" (not Yarn 1 Classic) with `nodeLinker: node-modules` mode             | `yarn --version`     |
 | 6   | **Platform build tools** | —                                | Native compilation tools needed by some Electron dependencies (see [Platform-Specific Setup](#platform-specific-setup) below)                      | —                    |
 
+### Official References
+
+Use the official project pages below when setting up the environment:
+
+- **Git clone workflow**: [GitHub Docs — Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
+- **nvm (macOS/Linux)**: [nvm-sh/nvm — Git install](https://github.com/nvm-sh/nvm#git-install)
+- **nvm verification and troubleshooting**: [nvm-sh/nvm — Verify installation](https://github.com/nvm-sh/nvm#verify-installation)
+- **nvm-windows**: [coreybutler/nvm-windows — latest releases](https://github.com/coreybutler/nvm-windows/releases/latest)
+- **Visual Studio Build Tools**: [Visual Studio Downloads](https://visualstudio.microsoft.com/downloads/)
+- **Corepack**: [nodejs/corepack — installation and usage](https://github.com/nodejs/corepack#how-to-install)
+- **Yarn**: [Yarn installation guide](https://yarnpkg.com/getting-started/install)
+
+### Recommended Setup Path
+
+For the least error-prone setup, follow this sequence exactly:
+
+1. Install platform build tools
+2. Install `nvm`
+3. Run `nvm install && nvm use`
+4. Run `corepack enable && corepack install`
+5. Run `yarn install`
+
+Avoid installing Node.js or Yarn globally for this project unless you have a specific reason to bypass the repository-managed toolchain.
+
 > **Why nvm instead of installing Node.js directly?**  
 > The project pins an exact Node.js version in the `.nvmrc` file (currently `24.11.0`). Using nvm guarantees every developer runs the same version and avoids "works on my machine" issues. When you run `nvm install && nvm use`, nvm reads `.nvmrc` and installs/activates that exact version automatically.
 
 > **Why Yarn 4 Berry?**  
-> Yarn 4 Berry is faster and more deterministic than npm or Yarn 1. The project configures it via `.yarnrc.yml` with `nodeLinker: node-modules`, meaning it still creates a traditional `node_modules/` folder (some Electron tooling requires this).
+> Yarn 4 Berry is faster and more deterministic than npm or Yarn 1. This repository pins Yarn through the `packageManager` field in `package.json` (`yarn@4.12.0`) and configures it via `.yarnrc.yml` with `nodeLinker: node-modules`, meaning it still creates a traditional `node_modules/` folder (some Electron tooling requires this).
 
 ### Platform-Specific Setup
 
@@ -83,13 +107,20 @@ You **must** complete the platform-specific setup for your operating system **be
 ```bash
 # 1. Install Xcode Command Line Tools (required for compiling native modules)
 #    This installs gcc, make, and other build essentials.
-#    A dialog will appear — click "Install" and wait for it to finish.
+#    You do NOT need the full Xcode.app to build Criterion.
 xcode-select --install
 
-# 2. Install nvm (Node Version Manager)
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+# 2. Install nvm using the official git-based method
+git clone https://github.com/nvm-sh/nvm.git ~/.nvm
+cd ~/.nvm
+git checkout v0.40.4
 
-# 3. Reload your shell so the `nvm` command becomes available
+# 3. Add nvm to your shell profile (run once, choose the file for your shell)
+echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.zshrc
+echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.zshrc
+# For bash, write the same two lines to ~/.bashrc instead.
+
+# 4. Reload your shell so the `nvm` command becomes available
 source ~/.zshrc    # If you use zsh (default on modern macOS)
 # source ~/.bashrc # If you use bash instead
 ```
@@ -97,8 +128,14 @@ source ~/.zshrc    # If you use zsh (default on modern macOS)
 **Verify it worked:**
 
 ```bash
-nvm --version   # Should print a version number like 0.40.0
+command -v nvm  # Should print: nvm
+nvm --version   # Should print a version number like 0.40.4
 ```
+
+Official references:
+
+- [nvm-sh/nvm — Git install](https://github.com/nvm-sh/nvm#git-install)
+- [nvm-sh/nvm — Verify installation](https://github.com/nvm-sh/nvm#verify-installation)
 
 </details>
 
@@ -109,24 +146,37 @@ nvm --version   # Should print a version number like 0.40.0
 # 1. Install system dependencies (required by Electron and native modules)
 #    These libraries are needed for Electron's Chromium runtime to function correctly.
 sudo apt update
-sudo apt install -y curl build-essential \
+sudo apt install -y git build-essential \
   libgtk-3-dev libnotify-dev libnss3 libxss1 libasound2 \
   libatk-bridge2.0-0 libgdk-pixbuf2.0-0 libx11-xcb1 \
   libxcomposite1 libxdamage1 libxrandr2 libxcursor1 \
   libxext6 libxcb1 libnspr4 libdrm2 libcups2 libexpat1
 
-# 2. Install nvm (Node Version Manager)
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+# 2. Install nvm using the official git-based method
+git clone https://github.com/nvm-sh/nvm.git ~/.nvm
+cd ~/.nvm
+git checkout v0.40.4
 
-# 3. Reload your shell
+# 3. Add nvm to your shell profile (run once)
+echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.bashrc
+echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bashrc
+# If you use zsh on Linux, write the same two lines to ~/.zshrc instead.
+
+# 4. Reload your shell
 source ~/.bashrc
 ```
 
 **Verify it worked:**
 
 ```bash
-nvm --version   # Should print a version number like 0.40.0
+command -v nvm  # Should print: nvm
+nvm --version   # Should print a version number like 0.40.4
 ```
+
+Official references:
+
+- [nvm-sh/nvm — Git install](https://github.com/nvm-sh/nvm#git-install)
+- [nvm-sh/nvm — Verify installation](https://github.com/nvm-sh/nvm#verify-installation)
 
 > **Linux Sandbox Note**: If you encounter sandbox errors when running the app, use `yarn dev-linux` instead of `yarn dev`. This sets `ELECTRON_DISABLE_SANDBOX=1` to bypass Chrome sandbox restrictions on some Linux configurations.
 
@@ -135,7 +185,7 @@ nvm --version   # Should print a version number like 0.40.0
 <details>
 <summary><strong>Windows</strong></summary>
 
-1. **Install nvm-windows**: Download the installer from [nvm-windows releases](https://github.com/coreybutler/nvm-windows/releases) and run it
+1. **Install nvm-windows**: Download the installer from [coreybutler/nvm-windows — latest releases](https://github.com/coreybutler/nvm-windows/releases/latest) and run it
 2. **Install Visual Studio Build Tools**: Download from [Visual Studio Downloads](https://visualstudio.microsoft.com/downloads/), select **"Desktop development with C++"** workload (this provides the C++ compiler needed by some native Node.js modules)
 3. **Open PowerShell as Administrator** and run:
 
@@ -156,12 +206,12 @@ node --version   # Should print v24.11.0
 
 ### Step-by-Step First Run
 
-Once your platform-specific setup is complete, run the following steps in order.
+Once your platform-specific setup is complete, run the following steps in order. Make sure you run those commands with administration rights.
 
 1. Clone the repository
 
 ```bash
-git clone <repository-url> criterion && cd criterion
+git clone https://code-repo.d4science.org/Resilience/WP3-criterion.git criterion && cd criterion
 ```
 
 Expected result: you are inside the `criterion` project folder.
@@ -169,19 +219,20 @@ Expected result: you are inside the `criterion` project folder.
 2. Install and activate the required Node.js version
 
 ```bash
-nvm install
-nvm use
+nvm install 24.11.0
+nvm use 24.11.0
 ```
 
 Expected result: terminal shows Node.js `v24.11.0` in use.
 
-3. Enable Corepack (Yarn 4)
+3. Enable Corepack and provision the project Yarn version
 
 ```bash
 corepack enable
+corepack install
 ```
 
-Expected result: command exits without errors.
+Expected result: commands exit without errors and `yarn --version` resolves to the version pinned by the repository.
 
 4. Install dependencies
 
@@ -294,7 +345,6 @@ Here's what the key configuration files in the project root do — you'll encoun
 | `tailwind.config.cjs`     | TailwindCSS configuration with custom color palette.                                                                                                                   |
 | `postcss.config.cjs`      | PostCSS config (used by TailwindCSS).                                                                                                                                  |
 | `jest.config.js`          | Jest test runner configuration.                                                                                                                                        |
-| `.gitlab-ci.yml`          | CI/CD pipeline definition (lint → build → distribute).                                                                                                                 |
 | `components.json`         | shadcn/ui component configuration.                                                                                                                                     |
 
 ### Environment Variables Quick Reference
@@ -370,16 +420,16 @@ criterion/
 │   ├── printPreview/            # PDF generation (Java, TinyTeX)
 │   ├── templates/               # Document templates
 │   └── styles/                  # Default styles
-└── docs/                        # Documentation
+└── *.md                         # Project documentation at repository root
 ```
 
 ### Strict Boundaries
 
-| Layer       | Can Import From                         | Cannot Import From            |
-| ----------- | --------------------------------------- | ----------------------------- |
-| `main/`     | Node.js, Electron main APIs             | `renderer/`, `preload/`       |
-| `preload/`  | Electron `contextBridge`, `ipcRenderer` | `main/`, `renderer/`, Node.js |
-| `renderer/` | React, window.\* APIs                   | `main/`, `preload/`, Node.js  |
+| Layer       | Can Import From                                      | Should Not Import From                  |
+| ----------- | ---------------------------------------------------- | --------------------------------------- |
+| `main/`     | Node.js, Electron main APIs, app main/shared modules | `renderer/`, preload UI-facing code     |
+| `preload/`  | Electron preload APIs, shared types/utilities        | `renderer/`, main window/menu internals |
+| `renderer/` | React, browser APIs, `window.*` preload APIs         | `main/`, Node.js built-ins              |
 
 **Security Notice**: Violations of these boundaries constitute security vulnerabilities. The renderer process must never have direct access to Node.js APIs.
 
@@ -424,17 +474,17 @@ User clicks Save
        │
        ▼
 ┌──────────────────┐
-│ React Component  │  calls window.doc.saveDocument(data)
+│ React Component  │  calls window.doc.saveDocument()
 └────────┬─────────┘
          │
          ▼
 ┌──────────────────┐
-│ Preload Bridge   │  ipcRenderer.invoke('document:save', data)
+│ Preload Bridge   │  ipcRenderer.invoke('document:saveDocument')
 └────────┬─────────┘
          │
          ▼
 ┌──────────────────┐
-│ Main Process     │  ipcMain.handle('document:save', handler)
+│ Main Process     │  ipcMain.handle('document:saveDocument', handler)
 │ document-manager │  → validates → writes to disk → returns path
 └────────┬─────────┘
          │
@@ -449,6 +499,8 @@ User clicks Save
 ## 5. Electron Configuration
 
 ### Security Configuration
+
+The main document views and most child windows use the following security settings. Helper windows such as the loader and tooltip use different settings because they render inline HTML without a preload bridge.
 
 | Setting            | Value   | Rationale                         |
 | ------------------ | ------- | --------------------------------- |
@@ -476,7 +528,7 @@ store.set("tabs", tabsArray);
 namespace:action[:subaction]
 
 Examples:
-  document:save
+  document:saveDocument
   document:export:tei
   tabs:new
   menu:update:apparatuses
@@ -486,7 +538,9 @@ Examples:
 
 ## 6. Preload API Reference
 
-The preload script exposes **11 namespaces** to the renderer via `window.*`:
+The preload script currently exposes `window.electron` from `@electron-toolkit/preload` plus **10 application-specific namespaces** via `window.*`.
+
+Source of truth: `src/preload/index.ts`.
 
 ### Namespace Overview
 
@@ -494,7 +548,7 @@ The preload script exposes **11 namespaces** to the renderer via `window.*`:
 | -------------------------- | --------------------------------- | ------------ |
 | `window.tabs`              | Tab lifecycle management          | 6            |
 | `window.menu`              | Menu state updates                | 19           |
-| `window.system`            | System utilities (fonts, dialogs) | 8            |
+| `window.system`            | System utilities and logging      | 9            |
 | `window.application`       | App state (toolbar, zoom)         | 9            |
 | `window.doc`               | Document operations               | 75+          |
 | `window.theme`             | Theme management                  | 2            |
@@ -509,77 +563,80 @@ The preload script exposes **11 namespaces** to the renderer via `window.*`:
 
 ```typescript
 // Save/Load
-window.doc.save(): Promise<SaveResult>
-window.doc.saveAs(): Promise<SaveResult>
-window.doc.saveDocument(data: DocumentData): Promise<void>
-window.doc.loadDocument(data: DocumentData): Promise<void>
+window.doc.openDocument(): Promise<void>
+window.doc.openDocumentAtPath(filePath: string): Promise<void>
+window.doc.saveDocument(): Promise<boolean>
 
 // Content
-window.doc.getContent(): Promise<JSONContent>
-window.doc.setContent(content: JSONContent): Promise<void>
+window.doc.getMainText(): Promise<JSONContent | null>
+window.doc.setMainText(content: JSONContent | null, shouldMarkAsTouched?: boolean): Promise<void>
 
 // Apparatuses
-window.doc.getApparatusesTypes(): Promise<ApparatusType[]>
-window.doc.getApparatusNotes(apparatusId: string): Promise<Note[]>
-window.doc.setApparatusNotes(apparatusId: string, notes: Note[]): Promise<void>
-window.doc.getApparatusContent(apparatusId: string): Promise<JSONContent>
-window.doc.setApparatusContent(apparatusId: string, content: JSONContent): Promise<void>
+window.doc.getApparatuses(): Promise<DocumentApparatus[]>
+window.doc.getApparatusWithId(id: string): Promise<DocumentApparatus | undefined>
+window.doc.updateApparatusIdWithContent(id: string, content: JSONContent, shouldMarkAsTouched?: boolean): Promise<void>
 
 // Export
-window.doc.exportToTei(): Promise<string>
-window.doc.printPdf(): Promise<void>
-window.doc.savePdf(): Promise<void>  // Shows save dialog
+window.doc.print(includeContent: PrintIncludeContents, options?: PrintOptions): Promise<void>
+window.doc.exportToTei(): Promise<void>
+window.doc.savePdf(includeSections: PrintSections): Promise<void>
+window.doc.getPrintPreview(): Promise<{ path: string | null; isLoaded: boolean; error: string | null }>
 
 // Styles & Templates
-window.doc.getDocumentStyles(): Promise<Style[]>
-window.doc.setDocumentStyles(styles: Style[]): Promise<void>
-window.doc.importStyles(): Promise<void>  // Shows file dialog
+window.doc.getStyles(): Promise<Style[]>
+window.doc.setStyles(styles: object[]): Promise<void>
+window.doc.importStyles(): Promise<string | null>
 window.doc.exportStyles(): Promise<void>
 window.doc.getTemplate(): Promise<Template>
+window.doc.getTemplates(): Promise<{ filename: string; template: Template }[]>
 
 // Sigla
-window.doc.getSigla(): Promise<Siglum[]>
-window.doc.setSigla(sigla: Siglum[]): Promise<void>
-window.doc.importSigla(): Promise<void>
+window.doc.getSiglumList(): Promise<DocumentSiglum[]>
+window.doc.setSiglumList(sigla: DocumentSiglum[] | null): Promise<void>
+window.doc.importSigla(): Promise<DocumentSiglum[]>
 window.doc.exportSigla(): Promise<void>
 
 // Find & Replace
-window.doc.find(query: string, options?: FindOptions): Promise<FindResult[]>
-window.doc.replace(query: string, replacement: string): Promise<void>
-window.doc.replaceAll(query: string, replacement: string): Promise<number>
+window.doc.openFind(): Promise<void>
+window.doc.findNext(): Promise<void>
+window.doc.findPrevious(): Promise<void>
+window.doc.replace(replacement: string): Promise<void>
+window.doc.replaceAll(replacement: string): Promise<void>
+window.doc.setSearchCriteria(options: SearchCriteria): Promise<void>
 ```
 
 #### `window.system` — System Utilities
 
 ```typescript
-window.system.getInstalledFonts(): Promise<string[]>
-window.system.openFileDialog(options?: DialogOptions): Promise<string[]>
-window.system.saveFileDialog(options?: DialogOptions): Promise<string>
-window.system.log(level: string, ...args: unknown[]): void
-window.system.openExternal(url: string): Promise<void>
-window.system.getAppVersion(): Promise<string>
-window.system.getPlatform(): string
-window.system.getLocale(): string
+window.system.getUserInfo(): Promise<void>
+window.system.getExternalLinks(): Promise<ExternalLinks>
+window.system.getFonts(): Promise<string[]>
+window.system.getSubsets(): Promise<Subset[]>
+window.system.getSymbols(fontName: string): Promise<CharacterSet>
+window.system.getConfiguredSpcialCharactersList(): Promise<CharacterConfiguration[]>
+window.system.showMessageBox(title: string, message: string, buttons: string[], type?: string): Promise<Electron.MessageBoxReturnValue>
+window.system.findWorker(payload: WorkerRequest): Promise<WorkerMatch[]>
+window.system.log(entry: LogEntry): Promise<void>
 ```
 
 #### `window.tabs` — Tab Management
 
 ```typescript
-window.tabs.newTab(options?: TabOptions): Promise<string>
-window.tabs.closeTab(tabId: string): Promise<void>
-window.tabs.selectTab(tabId: string): Promise<void>
-window.tabs.reorderTabs(tabIds: string[]): Promise<void>
-window.tabs.getSelectedTabId(): Promise<string>
-window.tabs.getAllContentViewsIds(): Promise<string[]>
+window.tabs.new(fileType: FileType): Promise<number | null>
+window.tabs.close(id: number): Promise<void>
+window.tabs.select(id: number, tabType: TabType): Promise<void>
+window.tabs.reorder(tabIds: number[]): Promise<void>
+window.tabs.getSelectedTabId(): Promise<number>
+window.tabs.getAllContentViewsIds(): Promise<number[]>
 ```
 
 #### `window.debug` — Debug Utilities
 
 ```typescript
-window.debug.getLayoutTabs(): Promise<TabLayout[]>
+window.debug.getLayoutTabs(): Promise<Tab[]>
 window.debug.getCurrentTabs(): Promise<Tab[]>
-window.debug.testTabRestoration(): Promise<void>
-window.debug.forceSaveTabs(): Promise<void>
+window.debug.testTabRestoration(): Promise<{ success: boolean; count?: number; error?: string }>
+window.debug.forceSaveTabs(): Promise<Tab[]>
 ```
 
 ### Adding a New IPC Channel
@@ -741,11 +798,8 @@ Editor content is stored as TipTap `JSONContent`:
 // NEVER store HTML, always JSON
 const content: JSONContent = editor.getJSON();
 
-// Store in Redux
-dispatch(setMainTextContent(content));
-
 // Persist via IPC
-await window.doc.setMainTextContent(content);
+await window.doc.setMainText(content, true);
 ```
 
 ---
@@ -803,28 +857,40 @@ Criterion uses **two complementary state systems**:
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface EditorState {
-  mainTextContent: JSONContent | null;
-  isDirty: boolean;
-  lastSaved: string | null;
+  editorMode: 'editing' | 'review';
+  canUndo: boolean;
+  canRedo: boolean;
+  apparatuses: Apparatus[];
+  documentTemplate: Template | null;
+  selectedNodeType: 'heading' | 'paragraph' | 'mixed' | null;
 }
 
 const initialState: EditorState = {
-  mainTextContent: null,
-  isDirty: false,
-  lastSaved: null,
+  editorMode: 'editing',
+  canUndo: false,
+  canRedo: false,
+  apparatuses: [],
+  documentTemplate: null,
+  selectedNodeType: null,
 };
 
 export const editorSlice = createSlice({
   name: "editor",
   initialState,
   reducers: {
-    setMainTextContent: (state, action: PayloadAction<JSONContent>) => {
-      state.mainTextContent = action.payload;
-      state.isDirty = true;
+    setCanUndo: (state, action: PayloadAction<boolean>) => {
+      state.canUndo = action.payload;
     },
-    markSaved: (state) => {
-      state.isDirty = false;
-      state.lastSaved = new Date().toISOString();
+    loadDocumentApparatuses: (state, action: PayloadAction<DocumentApparatus[]>) => {
+      state.apparatuses = action.payload.map((apparatus) => ({
+        id: apparatus.id,
+        title: apparatus.title,
+        type: apparatus.type,
+        visible: apparatus.visible ?? true,
+        expanded: apparatus.expanded ?? true,
+        notesVisible: apparatus.notesVisible ?? true,
+        commentsVisible: apparatus.commentsVisible ?? true,
+      }));
     },
   },
 });
@@ -840,30 +906,27 @@ Criterion documents use the `.critx` extension with JSON structure:
 
 ```typescript
 interface CritxDocument {
-  // Header
-  signature: "CRITX";
-  documentVersion: "1.0";
-  appVersion: string;
+  id: string;
+  version: string;
+  signature: string;
 
   // Content
-  mainText: JSONContent;
-  apparatuses: Apparatus[];
-  annotations: {
-    comments: Comment[];
-    bookmarks: Bookmark[];
-  };
+  mainText: JSONContent | null;
+  apparatuses: DocumentApparatus[];
+  annotations: Annotations;
 
   // Configuration
-  metadata: DocumentMetadata;
-  template: TemplateConfig;
-  styles: StyleDefinition[];
-  pageSetup: PageSetup;
+  template: Template;
+  referencesFormat: ReferencesFormat;
+  metadata: Metadata;
 
   // References
-  sigla: Siglum[];
-  bibliography: BibEntry[];
+  sigla: DocumentSiglum[];
+  bibliographies: Bibliography[];
 }
 ```
+
+When loading a document, the main process normalizes snake_case and camelCase keys and may preserve additional fields during migration.
 
 ### App Settings Persistence
 
@@ -874,11 +937,13 @@ Application settings are stored via `electron-store`:
 import Store from "electron-store";
 
 const store = new Store({
-  name: "criterion-settings",
   defaults: {
     theme: "system",
-    recentFiles: [],
-    windowBounds: { width: 1200, height: 800 },
+    statusbarVisible: true,
+    toolbarIsVisible: true,
+    recentDocuments: [],
+    statusBarConfig: ["pageNumber", "wordCount", "zoom"],
+    zoom: "100",
     tabs: [],
   },
 });
@@ -1010,9 +1075,9 @@ Building Criterion is a multi-step pipeline. Understanding the flow helps you de
 │     Output: dist/*.exe | dist/*.pkg | dist/*.deb                        │
 ├──────────────────────────────────────────────────────────────────────────┤
 │  4. PACKAGE-BUILD (optional)                                            │
-│     node scripts/package-build.cjs <platform> <env>  →  Zips the        │
+│     node scripts/package-build.cjs <platform> dev  →  Zips the          │
 │     installer artifact into a versioned .zip for distribution           │
-│     Output: dist/<platform>-build-<env>-<version>.zip                   │
+│     Output: dist/<platform>-build-dev-<version>.zip                     │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1022,9 +1087,7 @@ These commands **compile TypeScript → JavaScript** but do NOT create installer
 
 | Command              | Environment | What It Does                                           | Output        |
 | -------------------- | ----------- | ------------------------------------------------------ | ------------- |
-| `yarn build`         | Production  | Runs typecheck + Vite build with `.env.production`     | `out/` folder |
-| `yarn build:dev`     | Development | Same, but with `.env.development` (sourcemaps enabled) | `out/` folder |
-| `yarn build:staging` | Staging     | Same, but with `.env.staging`                          | `out/` folder |
+| `yarn build`         | Development | Runs typecheck + Vite build using local `.env`         | `out/` folder |
 
 > **Note**: The `build` command runs `typecheck` first. If type-checking fails, the build is aborted. Fix all TypeScript errors before building.
 
@@ -1067,39 +1130,18 @@ buildResources/printPreview/
 ```
 
 > [!IMPORTANT]
-> **To obtain a new version of `printpreview-0.0.1-SNAPSHOT.jar`, please refer to its own Developer Guide.** The JAR is a separate Java project maintained independently. If you need to update the PDF generation engine, contact the Print Preview team and follow their build/release process.
+> **To obtain a new version of `printpreview-0.0.1-SNAPSHOT.jar`, refer to the Print Preview Developer Guide.** The JAR is produced by a separate Java project, and that guide explains how to build and regenerate the artifact.
 
 > **How does electron-builder know what to include?** The `extraResources` section in `electron-builder.json` specifies which files from `buildResources/` are bundled. Each platform configuration (mac/win/linux) has its own `extraResources` block that includes only the JRE and TinyTeX for that operating system, keeping the installer size down.
 
-#### 3. Code Signing Certificates (for production releases)
-
-Code signing is **optional for development** but **required for production** releases:
-
-**macOS** — Requires an Apple Developer certificate. See [MACOS_CERTIFICATE_GUIDE.md](MACOS_CERTIFICATE_GUIDE.md).
-
-```bash
-# Set these environment variables before running dist-mac
-export CSC_LINK="path/to/certificate.p12"
-export CSC_KEY_PASSWORD="certificate-password"
-```
-
-**Windows** — Requires an Authenticode certificate. See [WINDOWS_CERTIFICATE_GUIDE.md](WINDOWS_CERTIFICATE_GUIDE.md).
-
-> **Building without certificates?** You can still create unsigned builds for testing. macOS will show a warning when opening unsigned apps. Windows SmartScreen may block unsigned `.exe` files.
-
 ### Distribution Commands — Full Reference
 
-| Command                   | Platform        | Env         | Installer Output | Zip Output                    |
-| ------------------------- | --------------- | ----------- | ---------------- | ----------------------------- |
-| `yarn dist-win`           | Windows x64     | Production  | `.exe` (NSIS)    | `windows-build-pre-<ver>.zip` |
-| `yarn dist-win:dev`       | Windows x64     | Development | `.exe` (NSIS)    | `windows-build-dev-<ver>.zip` |
-| `yarn dist-win:staging`   | Windows x64     | Staging     | `.exe` (NSIS)    | `windows-build-stg-<ver>.zip` |
-| `yarn dist-linux`         | Linux x64       | Production  | `.deb`           | `linux-build-pre-<ver>.zip`   |
-| `yarn dist-linux:dev`     | Linux x64       | Development | `.deb`           | `linux-build-dev-<ver>.zip`   |
-| `yarn dist-linux:staging` | Linux x64       | Staging     | `.deb`           | `linux-build-stg-<ver>.zip`   |
-| `yarn dist-mac`           | macOS x64+arm64 | Production  | `.pkg` (×2)      | `macos-build-pre-<ver>.zip`   |
-| `yarn dist-mac:dev`       | macOS x64+arm64 | Development | `.pkg` (×2)      | `macos-build-dev-<ver>.zip`   |
-| `yarn dist-mac:staging`   | macOS x64+arm64 | Staging     | `.pkg` (×2)      | `macos-build-stg-<ver>.zip`   |
+| Command                   | Platform        | Env         | Installer Output | Zip Output                    | Runs On |
+| ------------------------- | --------------- | ----------- | ---------------- | ----------------------------- | ------- |
+| `yarn dist-all`           | All             | Development | Mixed            | Per-platform `criterion_<platform>_<ver>.zip` | macOS only |
+| `yarn dist-win`           | Windows x64     | Development | `.exe` (NSIS)    | `criterion_windows_<ver>.zip` | Windows only |
+| `yarn dist-linux`         | Linux x64       | Development | `.deb`           | `criterion_linux_<ver>.zip`   | Linux only |
+| `yarn dist-mac`           | macOS x64+arm64 | Development | `.pkg` (×2)      | `criterion_macos_<ver>.zip`   | macOS only |
 
 ### Step-by-Step Distribution Per Platform
 
@@ -1111,16 +1153,16 @@ yarn dist-win
 
 What this command does internally:
 
-1. **`cross-env NODE_ENV=production`** — Sets environment to production
+1. **`cross-env NODE_ENV=development`** — Sets environment to development
 2. **`npm run build`** — Runs typecheck + Vite build (creates `out/` folder)
 3. **`electron-builder --win --x64`** — Packages everything into an NSIS installer:
    - Bundles compiled code from `out/`
-   - Bundles `node_modules` (production only)
+  - Bundles `node_modules` needed by the build
    - Copies `extraResources` (i18n, buildResources, **Windows JRE**, **TinyTeX-win**)
    - Creates `dist/Criterion-<version>.exe`
-4. **`node scripts/package-build.cjs windows pre`** — Zips the `.exe` into `dist/windows-build-pre-<version>.zip`
+4. **`node scripts/package-build.cjs windows dev`** — Zips the `.exe` into `dist/criterion_windows_<version>.zip`
 
-**Output**: `dist/Criterion-<version>.exe` + `dist/windows-build-pre-<version>.zip`
+**Output**: `dist/Criterion-<version>.exe` + `dist/criterion_windows_<version>.zip`
 
 #### Linux Distribution
 
@@ -1130,16 +1172,16 @@ yarn dist-linux
 
 What this command does internally:
 
-1. **`cross-env NODE_ENV=production`** — Sets environment to production
+1. **`cross-env NODE_ENV=development`** — Sets environment to development
 2. **`npm run build`** — Runs typecheck + Vite build
 3. **`electron-builder --linux --x64 --config.linux.target=deb`** — Creates a `.deb` package:
    - Includes `postinstall.sh` script (runs after installation on target machine)
    - Bundles **Linux JRE** and **TinyTeX-lin**
    - Declares system dependencies (libgtk-3-0, libnss3, etc.) in the `.deb` metadata
    - Creates `dist/Criterion-<version>.deb`
-4. **`node scripts/package-build.cjs linux pre`** — Zips the `.deb`
+4. **`node scripts/package-build.cjs linux dev`** — Zips the `.deb` into `dist/criterion_linux_<version>.zip`
 
-**Output**: `dist/Criterion-<version>.deb` + `dist/linux-build-pre-<version>.zip`
+**Output**: `dist/Criterion-<version>.deb` + `dist/criterion_linux_<version>.zip`
 
 #### macOS Distribution
 
@@ -1160,28 +1202,23 @@ What this command does internally:
    - Applies entitlements from `entitlements.mac.plist`
    - Runs `electron-builder-hooks.cjs` to inject pre/post install scripts into the `.pkg`
 4. **`electron-builder --mac pkg --arm64`** — Creates arm64 (Apple Silicon) `.pkg` installer
-5. **`node scripts/package-build.cjs macos pre`** — Zips both `.pkg` files
+5. **`node scripts/package-build.cjs macos dev`** — Zips both `.pkg` files into `dist/criterion_macos_<version>.zip`
 
-**Output**: `dist/Criterion-<version>-x64.pkg` + `dist/Criterion-<version>-arm64.pkg` + `dist/macos-build-pre-<version>.zip`
+**Output**: `dist/Criterion-installer-<version>-x64.pkg` + `dist/Criterion-installer-<version>-arm64.pkg` + `dist/criterion_macos_<version>.zip`
 
 > **Why two separate builds for macOS?** macOS supports both Intel (`x64`) and Apple Silicon (`arm64`) processors. Each architecture needs its own native binary. The build creates separate `.pkg` installers for each.
 
-### Environment-Specific Builds
+### Development-Only Builds
 
-The project supports three environments. The environment affects which `.env.*` file is loaded and what label appears in the build artifact:
-
-| Environment     | Env Suffix | `.env.*` File      | Use Case                                                    |
-| --------------- | ---------- | ------------------ | ----------------------------------------------------------- |
-| **Development** | `:dev`     | `.env.development` | Internal testing — debug tools enabled, verbose logging     |
-| **Staging**     | `:staging` | `.env.staging`     | Pre-release testing — debug tools enabled, moderate logging |
-| **Production**  | _(none)_   | `.env.production`  | Final release — debug tools disabled, error-only logging    |
+This repository is configured for development-only build workflows.
 
 **Examples:**
 
 ```bash
-yarn dist-win           # Production Windows build
-yarn dist-win:dev       # Development Windows build
-yarn dist-win:staging   # Staging Windows build
+yarn dist-all
+yarn dist-win
+yarn dist-linux
+yarn dist-mac
 ```
 
 ### Build Artifacts & Output
@@ -1192,43 +1229,20 @@ After a distribution build, the `dist/` folder contains:
 dist/
 ├── Criterion-<version>.exe              # Windows installer (if dist-win)
 ├── Criterion-<version>.deb              # Linux installer (if dist-linux)
-├── Criterion-<version>-x64.pkg          # macOS Intel installer (if dist-mac)
-├── Criterion-<version>-arm64.pkg        # macOS Apple Silicon installer (if dist-mac)
-├── <platform>-build-<env>-<version>.zip # Zipped artifact for distribution
+├── Criterion-installer-<version>-x64.pkg          # macOS Intel installer (if dist-mac)
+├── Criterion-installer-<version>-arm64.pkg        # macOS Apple Silicon installer (if dist-mac)
+├── criterion_<platform>_<version>.zip    # Zipped artifact created by scripts/package-build.cjs
 ├── *.blockmap                           # Delta update metadata (auto-update)
 └── builder-effective-config.yaml        # Resolved electron-builder config (for debugging)
 ```
 
-> **Where does the version number come from?** It's read from the `version` field in `package.json` (currently `1.4.0`). To release a new version, update this field before building.
-
-### CI/CD Pipeline
-
-The GitLab CI/CD pipeline (`.gitlab-ci.yml`) automates builds on push to specific branches:
-
-| Stage             | Branch                   | Jobs                                                                        |
-| ----------------- | ------------------------ | --------------------------------------------------------------------------- |
-| **Build-Check**   | `develop`, `pre`, `prod` | Typecheck (node + web), SonarQube analysis (prod only)                      |
-| **Build-Windows** | `develop`, `pre`, `prod` | Windows `.exe` build using `electronuserland/builder:wine` Docker image     |
-| **Build-Linux**   | `develop`, `pre`, `prod` | Linux `.deb` build using `electronuserland/builder` Docker image            |
-| **Build-macOS**   | _(commented out)_        | Requires a macOS runner (not available in Docker) — currently done manually |
-
-**Branch → Environment mapping in CI:**
-
-| Branch    | CI Environment | Build command        |
-| --------- | -------------- | -------------------- |
-| `develop` | Development    | `yarn build:dev`     |
-| `pre`     | Staging        | `yarn build:staging` |
-| `prod`    | Production     | `yarn build`         |
-
-> **macOS builds**: Since macOS cannot run in Docker, macOS builds are performed **manually** on a developer's machine using `yarn dist-mac`, `yarn dist-mac:dev`, or `yarn dist-mac:staging`.
+> **Where does the version number come from?** It's read from the `version` field in `package.json` (currently `1.1.0`). To release a new version, update this field before building.
 
 ### Pre-Commit Checklist
 
 ```bash
-# ALWAYS run these checks before committing changes
+# Minimum required check before committing changes
 yarn typecheck    # TypeScript type checking (node + web configs)
-yarn lint         # ESLint checks
-yarn test         # All Jest tests
 ```
 
 ### Troubleshooting Distribution Builds
@@ -1238,10 +1252,9 @@ yarn test         # All Jest tests
 | Build fails at typecheck                | TypeScript errors in codebase           | Fix all TS errors — build aborts on type errors                                |
 | `electron-builder` hangs (macOS)        | Stuck PKG processes from previous build | Run `./scripts/fix-mac-build.sh` manually, then retry                          |
 | `.pkg` missing pre/post install scripts | `scripts/pkg-scripts/` missing          | Check that `preinstall` and `postinstall` exist in `scripts/pkg-scripts/`      |
-| Windows build fails on macOS/Linux      | Cross-compilation missing Wine          | CI uses `electronuserland/builder:wine` — for local cross-builds, install Wine |
+| Windows build fails on macOS/Linux      | Cross-compilation support not available locally | Use a Windows environment, or install the toolchain required by your host setup |
 | `dist/` empty after build               | Build step failed silently              | Check terminal output; run `yarn build` separately to isolate                  |
 | Installer too large                     | Unnecessary resources bundled           | Check `electron-builder.json` `files` and `extraResources` filters             |
-| Code signing error (macOS)              | Certificate not set                     | Set `CSC_LINK` and `CSC_KEY_PASSWORD` env vars                                 |
 | `EPERM` or permission errors            | Previous build left locked files        | Run `yarn clean` then retry                                                    |
 
 ---
@@ -1252,12 +1265,12 @@ yarn test         # All Jest tests
 
 | Type                        | Convention         | Example            |
 | --------------------------- | ------------------ | ------------------ |
-| React components (reusable) | `snake_case.tsx`   | `button_group.tsx` |
-| React components (pages)    | `PascalCase.tsx`   | `HomePage.tsx`     |
-| Hooks                       | `camelCase.ts`     | `useWindowSize.ts` |
-| Utilities                   | `camelCase.ts`     | `formatDate.ts`    |
-| Types                       | `PascalCase.ts`    | `DocumentTypes.ts` |
-| Constants                   | `UPPER_SNAKE_CASE` | `MAX_FILE_SIZE`    |
+| Reusable React components   | Mixed: `PascalCase`, `kebab-case`, `snake_case` | `Typography.tsx`, `button-popover.tsx`, `account_button.tsx` |
+| React views/pages           | Mostly `PascalCase.tsx` | `WelcomeView.tsx` |
+| Hooks                       | Mostly `use-*.ts[x]` | `use-electron.ts`, `use-mobile.tsx` |
+| Utilities                   | Mostly `camelCase.ts` | `clipboardUtils.ts` |
+| Types                       | Global `.d.ts` and adjacent type files | `types.d.ts`, `shared/types.ts` |
+| Constants                   | Mixed: `camelCase` for maps/config, `UPPER_SNAKE_CASE` for fixed values | `apparatusTypeName`, `DEFAULT_PRINT_SECTION_SELECTED`, `FIND_MAX_DEPTH` |
 
 ### TypeScript Rules
 
@@ -1306,10 +1319,11 @@ const processed = useMemo(() =>
 
 ```typescript
 // Configured in tsconfig.json and electron.vite.config.ts
-import { Button } from "@components/ui/button";
-import { useEditor } from "@pages/editor/provider";
-import { formatDate } from "@utils/formatDate";
-import { store } from "@store/store";
+import cn from "@/utils/classNames";
+import Button from "@components/ui/button";
+import { editorContext } from "@pages/editor/provider/context";
+import store from "@store/store";
+import { textFormatColors } from "@utils/optionsEnums";
 ```
 
 | Alias          | Path                                 |
@@ -1373,9 +1387,9 @@ yarn dev
 ```typescript
 // 1. Check channel name matches exactly
 // Main:
-ipcMain.handle('document:save', ...)
+ipcMain.handle('document:saveDocument', ...)
 // Preload:
-ipcRenderer.invoke('document:save', ...)  // Must match!
+ipcRenderer.invoke('document:saveDocument')  // Must match exactly!
 
 // 2. Check preload is exposing the API
 contextBridge.exposeInMainWorld('doc', api);
@@ -1395,7 +1409,7 @@ console.log("Content:", JSON.stringify(content, null, 2));
 // Use Redux DevTools extension
 
 // 3. Check IPC is called
-window.doc.setMainTextContent(content).then(console.log);
+window.doc.setMainText(content, true).then(console.log);
 ```
 
 #### Memory Leak Prevention
@@ -1421,10 +1435,13 @@ useEffect(() => {
 
 ```typescript
 // Renderer → Main process logging
-window.system.log("info", "Message here", additionalData);
-window.system.log("error", "Error details", errorObject);
-window.system.log("debug", "Debug info");
-window.system.log("warn", "Warning message");
+window.system.log({
+  timestamp: new Date().toISOString(),
+  level: "info",
+  process: "renderer",
+  category: "editor",
+  message: "Message here",
+});
 
 // Log levels: debug, info, warn, error
 ```
@@ -1460,7 +1477,6 @@ Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`
 ### Pull Request Checklist
 
 - [ ] `yarn typecheck` passes
-- [ ] `yarn lint` passes
 - [ ] `yarn test` passes
 - [ ] Self-reviewed the diff
 - [ ] Updated relevant documentation
@@ -1542,27 +1558,26 @@ describe('WordCount', () => {
 | `VITE_DEBUG_MODE`       | Enable debug features         | `false`       |
 | `VITE_LOG_LEVEL`        | Log verbosity                 | `info`        |
 | `VITE_ENABLE_DEV_TOOLS` | Show Electron DevTools        | `false`       |
-| `CSC_LINK`              | Code signing certificate path | —             |
-| `CSC_KEY_PASSWORD`      | Certificate password          | —             |
 
 ### C. IPC Channel Registry
 
 <details>
-<summary>Click to expand full IPC channel list</summary>
+<summary>Click to expand a repository-verified IPC channel summary</summary>
 
 **Document Operations** (`document:*`):
 
-- `document:save`, `document:saveAs`, `document:saveDocument`, `document:loadDocument`
-- `document:getContent`, `document:setContent`
-- `document:getApparatusesTypes`, `document:getApparatusNotes`, `document:setApparatusNotes`
-- `document:getApparatusContent`, `document:setApparatusContent`
-- `document:printPdf`, `document:savePdf`, `document:exportToTei`
-- `document:getDocumentStyles`, `document:setDocumentStyles`, `document:importStyles`, `document:exportStyles`
-- `document:getSigla`, `document:setSigla`, `document:importSigla`, `document:exportSigla`
-- `document:find`, `document:replace`, `document:replaceAll`
+- `document:openDocument`, `document:openDocumentAtPath`, `document:saveDocument`
+- `document:getMainText`, `document:setMainText`
+- `document:getApparatuses`, `document:getApparatusWithId`, `document:updateApparatusIdWithContent`
+- `document:getTemplate`, `document:getTemplates`, `document:setTemplate`, `document:importTemplate`, `document:createTemplate`
+- `document:getStyles`, `document:getStylesFileNames`, `document:getStylesFromFile`, `document:importStyles`, `document:exportStyles`
+- `document:getSiglumList`, `document:setSiglumList`, `document:importSigla`, `document:exportSigla`
+- `document:print`, `document:savePdf`, `document:exportToTei`, `document:getPrintPreview`
+- `document:openFind`, `document:findNext`, `document:findPrevious`, `document:replace`, `document:replaceAll`
+- `document:setSearchCriteria`, `document:resetSearchCriteria`, `document:setReplaceInProgress`
 - `document:getMetadata`, `document:setMetadata`
 - `document:getPageSetup`, `document:setPageSetup`
-- `document:getBibliography`, `document:setBibliography`, `document:importBibliography`
+- `document:getBibliographies`, `document:setBibliographies`, `document:importBibliography`
 
 **Tab Management** (`tabs:*`):
 
@@ -1571,26 +1586,40 @@ describe('WordCount', () => {
 
 **Menu Updates** (`menu:*`):
 
-- `menu:enable`, `menu:disable`, `menu:update`
-- `menu:setApparatusesMenu`, `menu:setRecentFilesMenu`
-- `menu:enableUndo`, `menu:enableRedo`
-- `menu:enableCut`, `menu:enableCopy`, `menu:enablePaste`
+- `menu:disableReferencesMenuItems`, `menu:updateViewApparatusesMenuItems`
+- `menu:setTocVisibility`, `menu:setLineNumberShowLines`, `menu:setPrintPreviewVisibility`
+- `menu:setTocMenuItemsEnabled`, `menu:setTocSettingsEnabled`, `menu:setMenuFeatureEnabled`
+- `menu:setAddCommentMenuItemEnabled`, `menu:setAddBookmarkMenuItemEnabled`, `menu:setAddNoteMenuItemEnabled`
+- `menu:setAddReadingsEnabled`, `menu:setReferencesMenuCurrentContext`, `menu:setSiglumMenuItemEnabled`
+- `menu:setLinkMenuItemEnabled`, `menu:setRemoveLinkMenuItemEnabled`, `menu:setAddCitationMenuItemEnabled`, `menu:setSymbolMenuItemEnabled`
 
 **System** (`system:*`):
 
-- `system:getInstalledFonts`, `system:openFileDialog`, `system:saveFileDialog`
-- `system:log`, `system:openExternal`
-- `system:getAppVersion`, `system:getPlatform`, `system:getLocale`
+- `system:getUserInfo`, `system:getExternalLinks`
+- `system:getFonts`, `system:getSubsets`, `system:getSymbols`
+- `system:getConfiguredSpcialCharactersList`, `system:showMessageBox`, `system:worker`, `system:log`
 
 **Application** (`application:*`):
 
-- `application:setToolbarState`, `application:getToolbarState`
-- `application:setStatusBar`, `application:getZoom`, `application:setZoom`
+- `application:toolbarIsVisible`, `application:getStatusBarVisibility`
+- `application:readToolbarAdditionalItems`, `application:updateToolbarAdditionalItems`
+- `application:readStatusBarConfig`, `application:storeStatusBarConfig`
+- `application:readZoom`, `application:storeZoom`, `application:closeChildWindow`
+
+**Preferences / Theme / Tooltip / Shortcuts**:
+
+- `preferences:get`, `preferences:save`
+- `pageSetup:get`, `pageSetup:save`
+- `theme:setTheme`, `theme:getTheme`
+- `tooltip:show`, `tooltip:hide`, `tooltip:set-text`
+- `keyboard-shortcuts:getShortcuts`, `keyboard-shortcuts:setShortcut`, `keyboard-shortcuts:removeShortcut`, `keyboard-shortcuts:resetAll`
 
 **Debug** (`debug:*`):
 
 - `debug:getLayoutTabs`, `debug:getCurrentTabs`
 - `debug:testTabRestoration`, `debug:forceSaveTabs`
+
+For the full runtime-exposed surface, use `src/preload/index.ts` and `src/main/index.ts` as the source of truth.
 
 </details>
 
